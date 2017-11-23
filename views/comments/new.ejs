@@ -3,7 +3,6 @@
     <h1 style="text-align: center;">Add New Comment</h1>
     <div style="width: 30%; margin: 0 auto;">
         <form action="/campgrounds/<%= campground._id %>/comment" method="POST">
-        <input class="form-control form-group" type="text" placeholder="Author" name="comment[author]">
         <input class="form-control form-group" type="text" placeholder="Comment" name="comment[text]">
         <input class="btn btn-lg btn-primary form-group" type="submit">
         </form>

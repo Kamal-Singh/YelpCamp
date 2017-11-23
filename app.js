@@ -1,10 +1,18 @@
-var express     = require('express'),
-    app         = express(),
-    bodyParser  = require('body-parser'),
-    mongoose    = require('mongoose');
-    campgrounds = require('./models/campground'),
-    Comment     = require('./models/comments'),
-    seedDB      = require('./seed');
+var express         = require('express'),
+    app             = express(),
+    bodyParser      = require('body-parser'),
+    mongoose        = require('mongoose');
+    campgrounds     = require('./models/campground'),
+    Comment         = require('./models/comments'),
+    User            = require('./models/user'),
+    passport        = require('passport'),
+    localStrategy   = require('passport-local'),
+    seedDB          = require('./seed');
+
+// Routes Variable    
+var campgroundRoutes = require('./routes/campground'),
+commentRoutes    = require('./routes/comments'),
+indexRoutes      = require('./routes/index');
 
 //seed Data
 //seedDB();
@@ -15,87 +23,34 @@ app.set('view engine','ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname+'/public'));
 
-app.get('/', function(req, res){
-    res.render('landing');
-});
-//INDEX Route
-app.get('/campgrounds', function(req, res){
-    campgrounds.find({}, function(err, campgrounds){
-        if(err) {
-            console.log(err);
-        } else {
-            res.render('campgrounds/index', {campgrounds: campgrounds});
-        }
-    });
-});
+//Configuring Session
+app.use(require('express-session')({
+    secret: 'I don\'t know what to keep as my secret for a cookie',
+    saveUninitialized: false,
+    resave: false
+}));
 
-//CREATE Route
-app.post('/campgrounds', function(req, res){
-    var new_camp = {
-        name: req.body.name,
-        image: req.body.image,
-        description: req.body.description
-    };
-    campgrounds.create(new_camp, function(err, campground){
-        if(err) {
-            console.log(err);
-        } else {
-            res.redirect('/campgrounds');
-        }
-    })
+//Initializing Middleware Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+//Configure Passport
+passport.use(new localStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+//  My own middleware
+app.use(function(req, res, next){
+    res.locals.currentUser = req.user;
+    next();
 });
 
-//NEW ROUTE
-app.get('/campgrounds/new', function(req, res){
-    res.render('campgrounds/new');
-});
-
-//SHOW ROUTE
-app.get('/campgrounds/:id', function(req, res){
-    campgrounds.findById(req.params.id).populate('comments').exec(function(err, campgrounds){
-        if(err) {
-            console.log(err);
-        } else {
-            res.render('campgrounds/show', {campgrounds: campgrounds});
-        }
-    });
-});
-
-//===========================
-// Comment ROUTES
-//===========================
-
-
-//NEW ROUTE
-app.get('/campgrounds/:id/comment/new', function(req ,res){
-    campgrounds.findById(req.params.id, function(err ,campground){
-       if(err) {
-           console.log(err);
-       } else {
-           res.render('comments/new', {campground: campground});
-       }
-    });
-});
-
-//CREATE ROUTE
-app.post('/campgrounds/:id/comment', function(req, res){
-    campgrounds.findById(req.params.id, function(err, campground){
-        if(err) {
-            console.log(err);
-        } else {
-            Comment.create(req.body.comment, function(err, comment){
-                if(err) {
-                    console.log(err);
-                } else {
-                    campground.comments.push(comment);
-                    campground.save();
-                    res.redirect('/campgrounds/'+req.params.id);
-                }
-            });
-        }
-    });
-});
-
+//===============================
+// Routes
+//===============================
+app.use(campgroundRoutes);
+app.use(commentRoutes);
+app.use(indexRoutes);
 //==========================
 // SERVER LISTENER
 //==========================
