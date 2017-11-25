@@ -7,6 +7,7 @@ var express         = require('express'),
     User            = require('./models/user'),
     passport        = require('passport'),
     localStrategy   = require('passport-local'),
+    methodOverrdie  = require('method-override'),
     seedDB          = require('./seed');
 
 // Routes Variable    
@@ -15,13 +16,14 @@ commentRoutes    = require('./routes/comments'),
 indexRoutes      = require('./routes/index');
 
 //seed Data
-//seedDB();
+// seedDB();
 
 mongoose.connect('mongodb://localhost/yelp_camp', {useMongoClient: true});
 mongoose.Promise = global.Promise;
 app.set('view engine','ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname+'/public'));
+app.use(methodOverrdie('_method'));
 
 //Configuring Session
 app.use(require('express-session')({
@@ -45,6 +47,11 @@ app.use(function(req, res, next){
     next();
 });
 
+app.use(function(req, res, next){
+    if(req.path!='/login' && req.path!='/register' && req.path!='/logout')
+        req.session.returnTo = req.path;
+    next();
+});
 //===============================
 // Routes
 //===============================

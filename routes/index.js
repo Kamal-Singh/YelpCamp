@@ -35,23 +35,20 @@ router.get('/login', function(req, res){
 // Authentication 
 router.post('/login',  passport.authenticate('local', {
     failureRedirect: '/login',
-    successRedirect: '/campgrounds'
+    successReturnToOrRedirect: '/campgrounds'
 }), function(req, res){
+    // res.redirect(req.session.returnTo);
 });
 
 //  Logout 
 router.get('/logout', function(req,res){
     req.logout();
-    res.redirect('/campgrounds');
+    if(req.session.returnTo)
+        {
+            res.redirect(req.session.returnTo);
+        } else {
+            res.redirect('/campgrounds');
+        }
 });
-
-// Middleware for Checking Logging Status
-function isLoggedIn(req, res, next){
-    if(req.isAuthenticated()){
-        next();
-    } else {
-        res.redirect('/login');
-    }
-};
 
 module.exports = router;
