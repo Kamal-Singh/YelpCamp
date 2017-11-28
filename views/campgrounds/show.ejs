@@ -18,9 +18,13 @@
                     <p><%= campgrounds.description %></p>
                     <p><em>Submitted By <%= campgrounds.author.username %></em></p>
                     <% if(currentUser && campgrounds.author.id.equals(currentUser._id)) { %>
-                    <a class='btn btn-warning' href="/campgrounds/<%= campgrounds._id %>/edit">Edit</a>
+                    <a class="edit-glyph" href="/campgrounds/<%= campgrounds._id %>/edit">
+                        <span title="Edit Campground" class="glyphicon glyphicon-edit"></span>
+                    </a>
                     <form class="del-form" action="/campgrounds/<%= campgrounds._id %>?_method=DELETE" method="POST">
-                        <button class="btn btn-danger">Delete</button>
+                        <button class="remove-glyph">
+                            <span title="Remove Campground" class="glyphicon glyphicon-remove"></span>
+                        </button>
                     </form>
                    <% } %>
                 </div>
@@ -39,12 +43,11 @@
                                 <%= comment.text %>
                             </p>
                             <% if(currentUser && comment.author.id.equals(currentUser._id)) { %>
-                            <a class="btn btn-xs btn-warning"
-                            href='/campgrounds/<%= campgrounds._id %>/comment/<%= comment._id %>/edit'>
-                                Edit
-                        </a>
+                            <a class="edit-glyph" href='/campgrounds/<%= campgrounds._id %>/comment/<%= comment._id %>/edit'>
+                                <span title="Edit Comment" class="glyphicon glyphicon-edit"></span>
+                            </a>
                         <form class="del-form" action="/campgrounds/<%= campgrounds._id %>/comment/<%= comment._id %>?_method=DELETE" method=POST>
-                            <button class="btn btn-xs btn-danger">Delete</button>
+                            <button class="remove-glyph"><span title="Remove Comment" class="glyphicon glyphicon-remove"></span></button>
                         </form>
                         <% } %>
                         </div>

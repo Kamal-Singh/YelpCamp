@@ -8,7 +8,8 @@ var express         = require('express'),
     passport        = require('passport'),
     localStrategy   = require('passport-local'),
     methodOverrdie  = require('method-override'),
-    seedDB          = require('./seed');
+    seedDB          = require('./seed'),
+    flash           = require('connect-flash');
 
 // Routes Variable    
 var campgroundRoutes = require('./routes/campground'),
@@ -24,6 +25,7 @@ app.set('view engine','ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname+'/public'));
 app.use(methodOverrdie('_method'));
+app.use(flash());
 
 //Configuring Session
 app.use(require('express-session')({
@@ -43,10 +45,13 @@ passport.deserializeUser(User.deserializeUser());
 
 //  My own middleware
 app.use(function(req, res, next){
+    res.locals.error = req.flash('error');
+    res.locals.success = req.flash('success');
     res.locals.currentUser = req.user;
     next();
 });
 
+// Middleware for redirecting back
 app.use(function(req, res, next){
     if(req.path!='/login' && req.path!='/register' && req.path!='/logout')
         req.session.returnTo = req.path;

@@ -6,17 +6,22 @@ middlewareObj.checkCommentOwnership = function(req, res, next){
         {
             Comment.findById(req.params.comment_id, function(err, foundComment){
                 if(err) {
-                    res.redirect('back');
-                }  else if(foundComment.author.id.equals(req.user._id))
-                {
+                    req.flash('error', 'Error Occurred');
+                    res.redirect('/campgrounds/'+req.params.id);
+                } else if(!foundComment) {
+                    req.flash('error', 'Comment Not Found!!');
+                    res.redirect('/campgrounds');
+                }  else if(foundComment.author.id.equals(req.user._id)){
                     next();
                 } else {
-                    res.redirect('back');
+                    req.flash('error', 'Permission Denied!!');
+                    res.redirect('/campgrounds/'+req.params.id);
                 }
             });
         }
     else {
-        res.redirect('back');
+        req.flash('error', 'You Need To Be Logged In!!');
+        res.redirect('/campgrounds/'+req.params.id);
     }
 }
 
@@ -26,18 +31,23 @@ middlewareObj.checkCampgroundOwnership = function(req, res, next){
         campgrounds.findById(req.params.id, function(err, foundcamp){
             if(err) {
                 console.log(err);
-                res.redirect('back');
-            } 
-            else if(foundcamp.author.id.equals(req.user._id)) {
+                req.flash('error', 'Error Occurred!!');
+                res.redirect('/campgrounds/'+req.params.id);
+            } else if(!foundcamp) {
+                req.flash('error', 'Campground Not Found!!');
+                res.redirect('/campgrounds');
+            } else if(foundcamp.author.id.equals(req.user._id)) {
                 next();
             } 
             else {
-                res.redirect('back');
+                req.flash('error', 'Permission Denied');
+                res.redirect('/campgrounds/'+req.params.id);
             }
         });
     }
     else {
-        res.redirect('back');
+        req.flash('error', 'You Need To Be Logged In!!');
+        res.redirect('/campgrounds/'+req.params.id);
     }
 }
 
@@ -46,6 +56,7 @@ middlewareObj.isLoggedIn = function(req, res, next){
     if(req.isAuthenticated()){
         next();
     } else {
+        req.flash('error', 'You Need To Be Logged In!!!');
         res.redirect('/login');
     }
 };

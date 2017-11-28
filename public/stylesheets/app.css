@@ -13,3 +13,26 @@
 .del-form {
     display: inline;
 }
+
+.edit-glyph {
+    color: grey;
+    padding: 0 2px 0 0;
+    margin: 0;
+    font-size: 1.1em;
+}
+.edit-glyph:hover {
+    color: black;
+}
+
+.remove-glyph {
+    color: grey;
+    margin: 0;
+    padding: 0 0 0 2px;
+    font-size: 1.1em;
+    border: 0;
+    background-color: rgba(0,0,0,0);
+}
+
+.remove-glyph:hover {
+    color: black;
+}
